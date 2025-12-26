@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batis Nexus - API Server</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .status {
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .status-ok {
+            color: #0ea5e9;
+            font-weight: bold;
+        }
+
+        .endpoints {
+            margin-top: 30px;
+        }
+
+        .endpoint {
+            background: #f8fafc;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .endpoint:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .endpoint-title {
+            font-weight: bold;
+            color: #334155;
+            margin-bottom: 5px;
+        }
+
+        .endpoint-url {
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .endpoint-url a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .endpoint-url a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🚀 Batis Nexus</h1>
+        <p class="subtitle">Serveur API Node.js + Express</p>
+
+        <div class="status">
+            <span class="status-ok">✓ Serveur opérationnel</span>
+        </div>
+
+        <div class="endpoints">
+            <h2 style="color: #334155; margin-bottom: 15px;">Endpoints disponibles</h2>
+
+            <div class="endpoint">
+                <div class="endpoint-title">Health Check</div>
+                <div class="endpoint-url">
+                    <a href="/api/health" target="_blank">GET /api/health</a>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-title">API v1 - Info</div>
+                <div class="endpoint-url">
+                    <a href="/api/v1" target="_blank">GET /api/v1</a>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-title">API v1 - Status</div>
+                <div class="endpoint-url">
+                    <a href="/api/v1/status" target="_blank">GET /api/v1/status</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>✨ Fichiers statiques servis depuis /public</p>
+            <p>🔧 CORS activé pour toutes les origines (*)</p>
+        </div>
+    </div>
+</body>
+
+</html>
