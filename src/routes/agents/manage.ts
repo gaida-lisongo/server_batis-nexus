@@ -59,7 +59,7 @@ router.post('/', async (req, res) => {
 })
 
 // Route to upload agent photo
-router.put('/photo', upload.single('photo'), async (req: Request, res: Response) => {
+router.put('/photo', upload.single('photo'), async (req: Request & { file?: Express.Multer.File | undefined }, res: Response) => {
     try {
         const { agentId } = req.body;
 
