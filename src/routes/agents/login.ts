@@ -10,6 +10,8 @@ const router: Router = express.Router();
 router.post('/', async (req: Request, res: Response) => {
     try {
         const { matricule, secure } = req.body;
+        console.log("matricule : ", matricule);
+        console.log("secure : ", secure);
 
         if (!matricule || !secure) {
             return res.status(400).json({
