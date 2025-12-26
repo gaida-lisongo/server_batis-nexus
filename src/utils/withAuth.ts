@@ -1,79 +1,74 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { Request, Response, NextFunction } from 'express';
 import { JWTUtils, TokenPayload } from './jwt';
 
-export interface AuthenticatedRequest extends NextRequest {
+export interface AuthenticatedRequest extends Request {
   user: TokenPayload;
 }
 
 /**
- * Higher-order function pour protéger les routes API
+ * Middleware pour protéger les routes API
  */
-export function withAuth(
-  handler: (req: AuthenticatedRequest) => Promise<NextResponse>
-) {
-  return async (request: NextRequest): Promise<NextResponse> => {
-    try {
-      // Extraire le token
-      const token = extractToken(request);
-      
-      if (!token) {
-        return NextResponse.json(
-          { success: false, error: 'Token d\'authentification requis' },
-          { status: 401 }
-        );
-      }
+export const withAuth = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const token = extractToken(req);
 
-      // Vérifier le token
-      const payload = await JWTUtils.verifyToken(token);
-      
-      // Ajouter les informations utilisateur à la requête
-      const authenticatedRequest = request as AuthenticatedRequest;
-      authenticatedRequest.user = payload;
-      
-      // Appeler le handler avec la requête authentifiée
-      return await handler(authenticatedRequest);
-      
-    } catch (error) {
-      return NextResponse.json(
-        { success: false, error: 'Token invalide ou expiré' },
-        { status: 401 }
-      );
-    }
-  };
-}
-
-/**
- * Middleware pour les méthodes spécifiques
- */
-export function withAuthMethods(
-  methods: string[],
-  handler: (req: NextRequest) => Promise<NextResponse>
-) {
-  return async (request: NextRequest): Promise<NextResponse> => {
-    // Si la méthode n'est pas dans la liste, ne pas vérifier l'auth
-    if (!methods.includes(request.method)) {
-      return await handler(request);
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        error: 'Token d\'authentification requis'
+      });
     }
 
-    // Sinon, utiliser withAuth
-    return await withAuth(handler as any)(request);
-  };
-}
+    // Vérifier le token
+    const payload = await JWTUtils.verifyToken(token);
+
+    // Ajouter les informations utilisateur à la requête
+    (req as AuthenticatedRequest).user = payload;
+
+    next();
+
+  } catch (error: any) {
+    return res.status(401).json({
+      success: false,
+      error: 'Token invalide ou expiré',
+      details: error.message
+    });
+  }
+};
 
 /**
- * Extraire le token de la requête
+ * Middleware pour filtrer par rôles (optionnel)
  */
-function extractToken(request: NextRequest): string | null {
-  // Vérifier dans les headers Authorization
-  const authHeader = request.headers.get('authorization');
+export const withRole = (roles: string[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const authReq = req as AuthenticatedRequest;
+    if (!authReq.user || !authReq.user.role || !roles.includes(authReq.user.role)) {
+      return res.status(403).json({
+        success: false,
+        error: 'Accès non autorisé : rôle insuffisant'
+      });
+    }
+    next();
+  };
+};
+
+/**
+ * Extraire le token de la requête Express
+ */
+function extractToken(req: Request): string | null {
+  // 1. Vérifier dans les headers Authorization
+  const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
     return authHeader.substring(7);
   }
 
-  // Vérifier dans les cookies
-  const tokenCookie = request.cookies.get('auth-token');
-  if (tokenCookie) {
-    return tokenCookie.value;
+  // 2. Vérifier dans les cookies (si cookie-parser est utilisé ou manuellement)
+  const cookieHeader = req.headers.cookie;
+  if (cookieHeader) {
+    const match = cookieHeader.match(/auth-token=([^;]+)/);
+    if (match && match[1]) {
+      return match[1];
+    }
   }
 
   return null;

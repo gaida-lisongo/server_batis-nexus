@@ -19,13 +19,13 @@ async function getSignature(message: string): Promise<string> {
     false,
     ['sign']
   );
-  
+
   const signature = await crypto.subtle.sign(
     'HMAC',
     key,
     encoder.encode(message)
   );
-  
+
   // Convertir en hex
   return Array.from(new Uint8Array(signature))
     .map(b => b.toString(16).padStart(2, '0'))
@@ -41,10 +41,10 @@ export class JWTUtils {
       iat: now,
       exp: now + JWT_EXPIRES_IN
     };
-    
+
     const tokenString = JSON.stringify(tokenData);
     const signature = await getSignature(tokenString);
-    
+
     // Utiliser un séparateur différent du point pour éviter les conflits
     const combined = `${tokenString}|||${signature}`;
     const encoder = new TextEncoder();
@@ -56,27 +56,31 @@ export class JWTUtils {
     try {
       const decoded = atob(token);
       const parts = decoded.split('|||');
-      
+
       if (parts.length !== 2) {
         throw new Error('Format de token invalide');
       }
-      
+
       const [tokenString, signature] = parts;
-      
+
+      if (!tokenString || !signature) {
+        throw new Error('Format de token invalide');
+      }
+
       // Vérifier la signature
       const expectedSignature = await getSignature(tokenString);
-      
+
       if (signature !== expectedSignature) {
         throw new Error('Signature invalide');
       }
-      
+
       const payload = JSON.parse(tokenString) as TokenPayload;
-      
+
       // Vérifier l'expiration
       if (payload.exp && Date.now() > payload.exp) {
         throw new Error('Token expiré');
       }
-      
+
       return payload;
     } catch (error: any) {
       throw new Error(`Token invalide ou expiré: ${error.message}`);
@@ -87,6 +91,7 @@ export class JWTUtils {
     try {
       const decoded = atob(token);
       const [tokenString] = decoded.split('|||');
+      if (!tokenString) return null;
       return JSON.parse(tokenString) as TokenPayload;
     } catch (error) {
       return null;
