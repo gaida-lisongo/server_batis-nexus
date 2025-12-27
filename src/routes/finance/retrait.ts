@@ -76,6 +76,35 @@ router.get('/user/:id', async (req: Request, res: Response) => {
     }
 });
 
+router.get('/service/:designation', async (req: Request, res: Response) => {
+    try {
+        const { designation } = req.params;
+
+        if (!designation) {
+            return res.status(400).json({
+                success: false,
+                error: 'Designation requise'
+            });
+        }
+
+        const depenses = await Depense.find({ service: designation })
+            .populate('agentId')
+            .populate('anneeId');
+
+        return res.status(200).json({
+            success: true,
+            message: 'Retraits trouvés avec succès',
+            data: depenses
+        });
+    } catch (error: any) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            error: error.message || 'Erreur interne du serveur'
+        });
+    }
+});
+
 router.get('/all', async (req: Request, res: Response) => {
     try {
         const depenses = await Depense.find()
