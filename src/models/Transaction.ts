@@ -2,13 +2,15 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export const PRODUCT_TYPES = [
     'Inscription',
-    'Ressource', 
-    'Activity', 
+    'Ressource',
+    'Activity',
     'Recours',
     'Bulletin',
     'Document',
     'Enrollement',
-    'Modalite'
+    'Modalite',
+    'Stage',
+    'Sujet'
 ] as const;
 
 export interface ISubcription extends Document {
@@ -37,7 +39,7 @@ const TransactionSchema = new Schema<ITransaction>({
         lastSolde: { type: Number, required: true },
         newSolde: { type: Number, required: true },
     }]
-}, { timestamps: true });   
+}, { timestamps: true });
 
 // Modèle
 const Transaction: Model<ITransaction> = mongoose.models.Transaction || mongoose.model<ITransaction>('Transaction', TransactionSchema);

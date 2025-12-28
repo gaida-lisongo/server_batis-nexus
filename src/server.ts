@@ -14,6 +14,10 @@ import './models/Annee';
 import './models/Depense';
 import './models/Autorisation';
 import './models/Grade';
+import './models/Mention';
+import './models/Semestre';
+import './models/Etudiant';
+
 
 // Connexion à la base de données
 dbConnect()

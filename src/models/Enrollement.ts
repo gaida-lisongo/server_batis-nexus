@@ -12,7 +12,7 @@ export interface IEnrollement extends Document {
     planing: {
         date_examen: Date;
         matieres: mongoose.Types.ObjectId[];
-    };
+    }[];
     subscribers: {
         student: mongoose.Types.ObjectId;
         code: string;
@@ -56,7 +56,7 @@ const EnrollementSchema: Schema = new Schema({
         default: 'Pending',
         required: true
     },
-    planing: {
+    planing: [{
         date_examen: {
             type: Date,
             required: true
@@ -66,11 +66,11 @@ const EnrollementSchema: Schema = new Schema({
             ref: 'Matiere',
             required: true
         }
-    },
+    }],
     subscribers: [{
         student: {
             type: mongoose.Types.ObjectId,
-            ref: 'Student',
+            ref: 'Etudiant',
             required: true
         },
         code: {
