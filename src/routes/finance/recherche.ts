@@ -116,6 +116,47 @@ router.patch('/subscribe/:rechercheId', async (req: Request, res: Response) => {
 
 });
 
+router.patch('/note/:rechercheId', async (req: Request, res: Response) => {
+    try {
+        const { rechercheId } = req.params;
+        const { studentId, note } = req.body;
+
+        const recherche = await Recherche.findById(rechercheId);
+
+        if (!recherche) {
+            return res.status(404).json({
+                success: false,
+                error: 'Recherche non trouvé'
+            });
+        }
+
+        const student = recherche.subscribers.find((subscriber) => subscriber.student.toString() === studentId);
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                error: 'Etudiant non trouvé'
+            });
+        }
+
+        student.note = note;
+
+        await recherche.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Note modifié avec succès',
+            data: recherche
+        });
+    } catch (error: any) {
+        console.error("Erro when updating note : ", error);
+        return res.status(500).json({
+            success: false,
+            error: error.message || 'Erreur interne du serveur'
+        })
+    }
+})
+
 router.put('/id/:rechercheId', async (req: Request, res: Response) => {
     try {
         const { rechercheId } = req.params;
@@ -214,7 +255,45 @@ router.get('/promotion/:promotionId', async (req: Request, res: Response) => {
     }
 });
 
-router.delete('/recherche/:rechercheId', async (req: Request, res: Response) => {
+router.delete('/subscription', async (req: Request, res: Response) => {
+    try {
+        const { etudiantId, rechercheId } = req.body;
+        const recherche = await Recherche.findById(rechercheId);
+
+        if (!recherche) {
+            return res.status(404).json({
+                success: false,
+                error: 'Recherche non trouvé'
+            });
+        }
+
+        const etudiant = recherche.subscribers.find((subscriber) => subscriber.student.toString() === etudiantId);
+
+        if (!etudiant) {
+            return res.status(404).json({
+                success: false,
+                error: 'Etudiant non trouvé'
+            });
+        }
+
+        recherche.subscribers = recherche.subscribers.filter((subscriber) => subscriber.student.toString() !== etudiantId);
+
+        await recherche.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Abonné supprimé avec succès',
+        });
+    } catch (error: any) {
+        console.error("Erro when deleting etudiant : ", error);
+        return res.status(500).json({
+            success: false,
+            error: error.message || 'Erreur interne du serveur'
+        })
+    }
+})
+
+router.delete('/:rechercheId', async (req: Request, res: Response) => {
     try {
         const { rechercheId } = req.params;
 
