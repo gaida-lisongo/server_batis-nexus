@@ -1,27 +1,33 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 
-export interface IEnrollement extends Document {
+export interface IRecherche extends Document {
     promotionId: mongoose.Types.ObjectId;
     anneeId: mongoose.Types.ObjectId;
     amount: number;
     title: string;
     description: string;
-    matieres: mongoose.Types.ObjectId[];
+    categorie: 'Sujet' | 'Stage';
     status: string;
-    planing: {
-        date_examen: Date;
-        matieres: mongoose.Types.ObjectId[];
-    }[];
     subscribers: {
+        title: string;
+        description: string;
         student: mongoose.Types.ObjectId;
-        code: string;
+        tuteur?: mongoose.Types.ObjectId;
         date_inscription: Date;
+        planing?: {
+            date_tache: Date;
+            tache: string;
+            observation?: string;
+            statut: string;
+        }[];
+        report?: string;
+        note?: number;
     }[];
     createdAt: Date;
     updatedAt: Date;
 }
 
-const EnrollementSchema: Schema = new Schema({
+const RechercheSchema: Schema = new Schema({
     promotionId: {
         type: mongoose.Types.ObjectId,
         ref: 'Promotion',
@@ -44,9 +50,9 @@ const EnrollementSchema: Schema = new Schema({
         type: String,
         required: true
     },
-    matieres: {
-        type: [mongoose.Types.ObjectId],
-        ref: 'Matiere',
+    categorie: {
+        type: String,
+        enum: ['Sujet', 'Stage'],
         required: true
     },
     status: {
@@ -55,30 +61,50 @@ const EnrollementSchema: Schema = new Schema({
         default: 'Pending',
         required: true
     },
-    planing: [{
-        date_examen: {
-            type: Date,
+    subscribers: [{
+        title: {
+            type: String,
             required: true
         },
-        matieres: {
-            type: [mongoose.Types.ObjectId],
-            ref: 'Matiere',
+        description: {
+            type: String,
             required: true
-        }
-    }],
-    subscribers: [{
+        },
         student: {
             type: mongoose.Types.ObjectId,
             ref: 'Etudiant',
             required: true
         },
-        code: {
-            type: String,
+        tuteur: {
+            type: mongoose.Types.ObjectId,
+            ref: 'Agent',
             required: true
         },
         date_inscription: {
             type: Date,
             default: Date.now
+        },
+        planing: [{
+            date_tache: {
+                type: Date,
+            },
+            tache: {
+                type: String,
+            },
+            observation: {
+                type: String,
+            },
+            statut: {
+                type: String,
+                enum: ['Pending', 'Completed', 'Failed'],
+                default: 'Pending'
+            }
+        }],
+        report: {
+            type: String,
+        },
+        note: {
+            type: Number,
         }
     }],
     createdAt: {
@@ -91,6 +117,6 @@ const EnrollementSchema: Schema = new Schema({
     }
 });
 
-const Enrollement: Model<IEnrollement> = mongoose.model<IEnrollement>('Enrollement', EnrollementSchema);
+const Recherche: Model<IRecherche> = mongoose.model<IRecherche>('Recherche', RechercheSchema);
 
-export default Enrollement;
+export default Recherche;
