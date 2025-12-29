@@ -3,10 +3,11 @@ import mongoose, { Schema, Document, Model, Types } from 'mongoose';
 // 1. Définir les Interfaces pour les propriétés des Documents
 export interface ISection extends Document {
   designation: string;
-  bureau: [{
+  bureau: {
+    _id?: Types.ObjectId;
     agent: Types.ObjectId;
     role: string;
-  }];
+  }[];
   filieres?: Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
@@ -25,10 +26,11 @@ export interface IPromotion extends Document {
 export interface IFiliere extends Document {
   designation: string;
   description?: string;
-  bureau: [{
+  bureau: {
+    _id?: Types.ObjectId;
     agent: Types.ObjectId;
     role: string;
-  }];
+  }[];
   promotions?: Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
